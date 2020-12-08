@@ -6,8 +6,9 @@ library(dplyr)
 library(forcats)
 
 # load master
-master<-read.csv('first_clean_master_11052020.csv')
-str(master)
+#master<-read.csv('first_clean_master_11052020.csv')
+  master<-read.csv("D:\\OneDrive - University of Glasgow\\_D_Backup\\Data\\Fryxell Transects\\herbiv_master_20200707.csv")
+  str(master)
 
 #make sure master file dates are as dates
 master$Date<-paste(master$Day,master$Month,master$Year,sep='/')
@@ -16,10 +17,14 @@ master$Date<-as.Date(master$Date,format='%d/%m/%Y')
 
 # clean new data 
 
-path<-"C:\\Users\\giova\\Desktop\\new_herbiv_data"
+#path<-"C:\\Users\\giova\\Desktop\\new_herbiv_data"
+path<-"D:\\OneDrive - University of Glasgow\\_D_Backup\\Data\\Fryxell Transects\\_Raw Data From Field Staff\\_New Data from Field Staff that needs to be entered into Master"
+
+#open every file from field staff and add 3 additional columns DATE DAY MONTH YEAR.  Double check the DATE column because often the day and month are reversed.  Enter the correct DAY MONTH YEAR into the appropriate columns
 
 # this will create a list of all .csv files names present in the specified folder
 filelist<-list.files(path, full.names = TRUE,pattern=".csv$")
+
 
 # makes a list of the dataframes
 datalist<-lapply(filelist,FUN = read.csv, header=TRUE)
@@ -71,14 +76,17 @@ for (i in 1:N){
   if (newmaster$Total[i]== 0) {
     
     newmaster$Total[i]<-(newmaster$F.New.born[i]+newmaster$F.1.4.[i]+newmaster$F.1.2.[i]+newmaster$F.Ad[i]+
-                           newmaster$M.1.4.[i]+newmaster$M.1.2.[i]+newmaster$M.Ad[i]+newmaster$Un.id.sex_Adults[i])}
+                           newmaster$M.1.4.[i]+newmaster$M.1.2.[i]+newmaster$M.Ad[i]+newmaster$Un.id.sex_Adults[i])} # in the case where there is no TOTAL, calculate the total based on the sum of all the observations
   if (newmaster$Total[i]>=1) {
     newmaster$Un.id.sex_Adults[i]<-newmaster$Total[i] - sum(newmaster$F.New.born[i],newmaster$F.1.4.[i],newmaster$F.1.2.[i],
                                                             newmaster$F.Ad[i],newmaster$M.1.4.[i],
-                                                            newmaster$M.1.2.[i],newmaster$M.Ad[i])}}
+                                                            newmaster$M.1.2.[i],newmaster$M.Ad[i])}} #in the case where there is a TOTAL but no data in the UNIDENTIFIED column, then calculate the difference between the sum of all observation and the TOTAL and enter the remainder into the UNIDENTIFIED column  
 
 #remove potential row duplicates before saving the file on disk
+newmaster[duplicated(newmaster),]
 newmaster<-newmaster[!duplicated(newmaster),]
+nrow(newmaster)
+
 
 # order it by date
 newmaster<-newmaster[order(newmaster$Date),]
