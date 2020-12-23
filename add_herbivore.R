@@ -12,7 +12,7 @@ library(forcats)
 
 #make sure master file dates are as dates
 master$Date<-paste(master$Day,master$Month,master$Year,sep='/')
-master$Date<-as.Date(master$Date,format='%d/%m/%Y')
+master$Date<-as.character(master$Date)
 
 
 # clean new data 
